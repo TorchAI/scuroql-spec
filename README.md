@@ -2,7 +2,7 @@
 
 ScuroQL is a query language for APIs created by TorchAI. 
 
-The ScuroQL will be used accompanied with Scuro Server. The Scuro Server will return the result as requested in a json format.
+The ScuroQL will be used accompanied with Scuro Server. The Scuro Server will return the result as ScuroQL query requested in a json format.
 
 For more information about Scuro, please refer (here)[https://github.com/TorchAI/scuro].
 
@@ -145,12 +145,12 @@ This part represents `answer.user_id = user_account.id` in the final parsed SQL 
  ```
  
  
- Finally, since Scuro will return a json result back, it will add a wrapped on the parsed result `Dummy[]: {}` 
+Finally, the Scuro server will wrap the parsed query with `array_agg(row_to_json())` to return json as result.
 
 So the above ScuroQL query corresponds the following SQL:
 
 ```
-SELECT row_to_json(tmp) 
+SELECT array_agg(row_to_json(tmp)) AS dummy
 FROM   (SELECT id, 
                created_at, 
                (SELECT array_to_json(array_agg(row_to_json(tmp))) 
@@ -162,7 +162,34 @@ FROM   (SELECT id,
 ```
 
 
+The returned body will look like this:
 
+```
+{
+  "dummy": [
+    "{\"id\":1,\"created_at\":\"6:47:48\",\"user_answers\":[{\"question_id\":1,\"created_at\":\"2019-07-22\"}]}",
+    "{\"id\":2,\"created_at\":\"5:10:53\",\"user_answers\":[{\"question_id\":2,\"created_at\":\"2019-07-06\"}]}",
+    "{\"id\":3,\"created_at\":\"20:40:36\",\"user_answers\":[{\"question_id\":3,\"created_at\":\"2019-09-13\"}]}",
+    "{\"id\":4,\"created_at\":\"0:29:56\",\"user_answers\":[{\"question_id\":4,\"created_at\":\"2019-10-14\"}]}",
+    "{\"id\":5,\"created_at\":\"22:37:02\",\"user_answers\":[{\"question_id\":5,\"created_at\":\"2019-07-26\"}]}",
+    "{\"id\":6,\"created_at\":\"16:05:24\",\"user_answers\":[{\"question_id\":6,\"created_at\":\"2019-11-23\"}]}",
+    "{\"id\":7,\"created_at\":\"16:10:51\",\"user_answers\":[{\"question_id\":7,\"created_at\":\"2019-07-07\"}]}",
+    "{\"id\":8,\"created_at\":\"2:23:41\",\"user_answers\":[{\"question_id\":8,\"created_at\":\"2020-02-06\"}]}",
+    "{\"id\":9,\"created_at\":\"19:08:15\",\"user_answers\":[{\"question_id\":9,\"created_at\":\"2019-05-19\"}]}",
+    "{\"id\":10,\"created_at\":\"17:35:55\",\"user_answers\":[{\"question_id\":10,\"created_at\":\"2020-03-16\"}]}",
+    "{\"id\":11,\"created_at\":\"20:51:09\",\"user_answers\":[{\"question_id\":11,\"created_at\":\"2020-04-30\"}]}",
+    "{\"id\":12,\"created_at\":\"10:16:13\",\"user_answers\":[{\"question_id\":12,\"created_at\":\"2019-06-30\"}]}",
+    "{\"id\":13,\"created_at\":\"21:40:50\",\"user_answers\":[{\"question_id\":13,\"created_at\":\"2019-12-10\"}]}",
+    "{\"id\":14,\"created_at\":\"2:10:31\",\"user_answers\":[{\"question_id\":14,\"created_at\":\"2019-07-06\"}]}",
+    "{\"id\":15,\"created_at\":\"2:36:59\",\"user_answers\":[{\"question_id\":15,\"created_at\":\"2019-11-29\"}]}",
+    "{\"id\":16,\"created_at\":\"23:38:22\",\"user_answers\":[{\"question_id\":16,\"created_at\":\"2019-12-22\"}]}",
+    "{\"id\":17,\"created_at\":\"10:59:30\",\"user_answers\":[{\"question_id\":17,\"created_at\":\"2020-04-16\"}]}",
+    "{\"id\":18,\"created_at\":\"13:38:55\",\"user_answers\":[{\"question_id\":18,\"created_at\":\"2019-12-01\"}]}",
+    "{\"id\":19,\"created_at\":\"8:43:30\",\"user_answers\":[{\"question_id\":19,\"created_at\":\"2019-07-16\"}]}",
+    "{\"id\":20,\"created_at\":\"21:30:13\",\"user_answers\":[{\"question_id\":20,\"created_at\":\"2019-11-06\"}]}"
+  ]
+}
+```
 
 
 ## Motivation
