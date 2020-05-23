@@ -44,6 +44,18 @@ test_array_json = {
         }
     }
 ```
+which is equivalent to SQL query:
+```SQL
+SELECT array_agg(row_to_json(tmp)) AS dummy
+FROM   (SELECT id, 
+               created_at, 
+               (SELECT array_to_json(array_agg(row_to_json(tmp))) 
+                FROM   (SELECT question_id, 
+                               created_at answer 
+                        WHERE  ( answer.user_id = user_account.id )) tmp) AS 
+                      user_answers 
+        FROM   user_account) tmp
+```
 
 Let's break it down.
 
