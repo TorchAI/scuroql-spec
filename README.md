@@ -123,7 +123,7 @@ This part represents `answer.user_id = user_account.id` in the final parsed SQL 
  
  From above, we know `ARRAY_JSON` is an opearator, and it takes the elements in its json body as input parameters.
  
- `ARRAY_JSON` tells it will apply `array_to_json(array_agg(row_to_json()))` operation on its value.
+ `ARRAY_JSON` is a ScuroQL customized keyword which apply `array_to_json(array_agg(row_to_json()))` operation on its value.
  
  The `"ALIAS": 'user_answers'` parameters tells that the aggregated result will be viewed as `user_answers`
  
