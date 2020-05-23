@@ -2,10 +2,9 @@
 
 ScuroQL is a query language for APIs created by TorchAI. 
 
-The ScuroQL will be used accompanied with Scuro Server. The Scuro Server will return the result as ScuroQL query requested in a json format.
+The ScuroQL will be used accompanied with Scuro Server. The Scuro Server will return the result as ScuroQL query requested in a json format. For more information about Scuro, please refer here.
 
-For more information about Scuro, please refer (here)[https://github.com/TorchAI/scuro].
-
+Go to wiki tab of this repo to see the documentation of ScuroQL.
 
 
 ## Overview
