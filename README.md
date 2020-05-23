@@ -2,7 +2,7 @@
 
 ScuroQL is a query language for APIs created by TorchAI. 
 
-The ScuroQL will be used accompanied with Scuro Server. The Scuro Server will return the result as ScuroQL query requested in a json format. For more information about Scuro, please refer here.
+The ScuroQL will be used accompanied with Scuro Server. The Scuro Server will return the result as ScuroQL query requested in a json format. For more information about Scuro, please refer [here](https://github.com/TorchAI/scuro).
 
 Go to wiki tab of this repo to see the documentation of ScuroQL.
 
@@ -30,7 +30,7 @@ You can format the following json and sent it to Scuro server.
 
 ```
 test_array_json = {
-    "Dummy[]": {
+    "dummy[]": {
         "SELECT":  ["id", 'created_at', {"ARRAY_JSON": {
                                                 "ALIAS": 'user_answers',
                                                 "SELECT": ['question_id', 'created_at'],
@@ -51,11 +51,11 @@ Let's break it down.
 The outermost json is:
 
 ```
-"Dummy[]": {}
+"dummy[]": {}
 
 ```
-Here, `Dummy` will be the name of the returned result of its json body .
-`[]` indicates that the json inside the {} will contain all the information of a single, independent, full SQL query.
+Here, `dummy` will be the name of the returned result of its json body.
+`[]` tells that the the value of `dummy[]` contains all the information of a single, independent, full SQL query.
 
 
 ```
@@ -65,27 +65,10 @@ Here, `Dummy` will be the name of the returned result of its json body .
  }       
  ```
 `"SELECT": []` specifies the columns will be seleced.
-`"FROM": ["user_account"]` tells the table to select from.
+`"FROM": []` tells the table to select from.
 
 Here it will select `"id", 'created_at'` columns from `user_account` table.
 
-
-```
-test_array_json = {
-    "Dummy[]": {
-        "SELECT":  ["id", 'created_at', {"ARRAY_JSON": {
-                                                "ALIAS": 'user_answers',
-                                                "SELECT": ['question_id', 'created_at'],
-                                                "FROM": "answer",
-                                                "WHERE": {
-                                                    "=":
-                                                        {'answer.user_id': 'user_account.id'}
-                                                }
-                                    }}],
-        "FROM": ["user_account"]
-        }
-    }
-```
 
 There is another element in `SELECT`:
 
@@ -128,11 +111,13 @@ This part represents `answer.user_id = user_account.id` in the final parsed SQL 
  
  From above, we know `ARRAY_JSON` is an opearator, and it takes the elements in its json body as input parameters.
  
- `ARRAY_JSON` tells it will apply `Array_to_json(Array_agg(Row_to_json()))` operation on the inside operation.
+ `ARRAY_JSON` tells it will apply `array_to_json(array_agg(row_to_json()))` operation on its value.
  
- The `"ALIAS": 'user_answers'` parameters tells that the aggregated result wil be view as `user_answers`
+ The `"ALIAS": 'user_answers'` parameters tells that the aggregated result will be viewed as `user_answers`
  
- So the above json represents 
+ Finally, the Scuro server will wrap the parsed query with `array_agg(row_to_json())` to return json as result.
+ 
+ So the above json represents a subquery:
  
  ```
  SELECT array_to_json(array_agg(row_to_json(tmp))) 
@@ -142,11 +127,8 @@ This part represents `answer.user_id = user_account.id` in the final parsed SQL 
            WHERE  ( 
                      answer.user_id = user_account.id)) tmp) as user_answers
  ```
- 
- 
-Finally, the Scuro server will wrap the parsed query with `array_agg(row_to_json())` to return json as result.
 
-So the above ScuroQL query corresponds the following SQL:
+The ScuroQL query at the very beginning corresponds the following SQL:
 
 ```
 SELECT array_agg(row_to_json(tmp)) AS dummy
